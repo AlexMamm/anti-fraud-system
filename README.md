@@ -72,9 +72,16 @@ Anti-fraud system - система мониторинга и защиты от �
 
 ### Настройка облачной инфраструктуры
 - Создано объектное хранилище s3 и скопированы данные для обучения: s3://amamylov-mlops
-  ![image](https://github.com/AlexMamm/anti-fraud-system/assets/107932243/ebc6d35c-09c4-41f4-be0a-c09be48c2f73)
+![image](https://github.com/AlexMamm/anti-fraud-system/assets/107932243/f8e194b4-4ed9-4a85-8d91-09e5444f3f6b)
+![image](https://github.com/AlexMamm/anti-fraud-system/assets/107932243/c4561491-dcad-4cea-9070-dd75d3c86cd9)
+
 - Создан spark-кластер согласно конфигурации, переданной от Заказчика. Настроено ssh-соединение с мастернодой. Скопированы данные для обучения в распределенную систему HDFS.
-  ![image](https://github.com/AlexMamm/anti-fraud-system/assets/107932243/da29f073-c0ce-48c8-b3f3-c0190550ab02)
+![image](https://github.com/AlexMamm/anti-fraud-system/assets/107932243/fc56286e-c8d2-44f1-adb1-3149e22a9b84)
+![image](https://github.com/AlexMamm/anti-fraud-system/assets/107932243/ab638e0a-12b6-467c-95dc-a7a5742edb4d)
+![image](https://github.com/AlexMamm/anti-fraud-system/assets/107932243/71040994-1992-4fab-b105-c62af4853100)
+![image](https://github.com/AlexMamm/anti-fraud-system/assets/107932243/53383e71-e7a5-4acd-9b97-542c38c1905c)
+
+
 
  
 
