@@ -3,12 +3,10 @@ from datetime import datetime, timedelta
 from airflow import DAG, settings
 from airflow.models import Connection, Variable
 from airflow.utils.trigger_rule import TriggerRule
-from airflow.operators.python import PythonOperator
 from airflow.providers.yandex.operators.yandexcloud_dataproc import (
     DataprocCreateClusterOperator,
     DataprocCreatePysparkJobOperator,
     DataprocDeleteClusterOperator,
-
 )
 
 
@@ -23,7 +21,6 @@ YC_INPUT_DATA_BUCKET = 'amamylov-mlops/airflow/'
 YC_SOURCE_BUCKET = 'amamylov-mlops'
 YC_DP_LOGS_BUCKET = 'amamylov-mlops/airflow_logs/'
 
-
 session = settings.Session()
 ycS3_connection = Connection(
     conn_id='yc-s3',
@@ -35,7 +32,6 @@ ycS3_connection = Connection(
         "host": "https://storage.yandexcloud.net/"
     }
 )
-
 
 if not session.query(Connection).filter(Connection.conn_id == ycS3_connection.conn_id).first():
     session.add(ycS3_connection)
@@ -54,11 +50,10 @@ if not session.query(Connection).filter(Connection.conn_id == ycSA_connection.co
     session.add(ycSA_connection)
     session.commit()
 
-
 with DAG(
-        dag_id = 'pyspark_preprocessing',
-        start_date=datetime(year = 2024,month = 1,day = 20),
-        schedule_interval = timedelta(minutes=60),
+        dag_id='pyspark_preprocessing',
+        start_date=datetime(year=2024, month=1, day=20),
+        schedule_interval=timedelta(hours=6),
         catchup=False
 ) as ingest_dag:
 
@@ -78,19 +73,23 @@ with DAG(
         masternode_disk_size=20,
         datanode_resource_preset='s3-c4-m16',
         datanode_disk_type='network-ssd',
-        datanode_disk_size=80,
+        datanode_disk_size=60,
         datanode_count=2,
-        services=['YARN', 'SPARK', 'HDFS', 'MAPREDUCE'],  
-        computenode_count=0,           
+        services=['YARN', 'SPARK', 'HDFS', 'MAPREDUCE'],
+        computenode_count=0,
         connection_id=ycSA_connection.conn_id,
         dag=ingest_dag
     )
 
     poke_spark_processing = DataprocCreatePysparkJobOperator(
         task_id='dp-cluster-pyspark-task',
-        main_python_file_uri=f's3a://amamylov-mlops/scripts/pyspark_script.py',
-        connection_id = ycSA_connection.conn_id,
-        dag=ingest_dag
+        main_python_file_uri=f's3a://{YC_SOURCE_BUCKET}/scripts/pyspark_script.py',
+        connection_id=ycSA_connection.conn_id,
+        dag=ingest_dag,
+        properties={'spark.submit.deployMode': 'cluster',
+                    'spark.yarn.dist.archives': f's3a://{YC_SOURCE_BUCKET}/pyspark_venv.tar.gz#venv1',
+                    'spark.yarn.appMasterEnv.PYSPARK_PYTHON': './venv1/bin/python',
+                    'spark.yarn.appMasterEnv.PYSPARK_DRIVER_PYTHON': './venv1/bin/python'}
     )
 
     delete_spark_cluster = DataprocDeleteClusterOperator(
@@ -98,6 +97,5 @@ with DAG(
         trigger_rule=TriggerRule.ALL_DONE,
         dag=ingest_dag
     )
-
 
     create_spark_cluster >> poke_spark_processing >> delete_spark_cluster
