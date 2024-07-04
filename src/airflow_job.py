@@ -20,6 +20,7 @@ YC_DP_GROUP_ID = 'enpsr5k5crdqaq3a5jrp'
 YC_INPUT_DATA_BUCKET = 'amamylov-mlops/airflow/'
 YC_SOURCE_BUCKET = 'amamylov-mlops'
 YC_DP_LOGS_BUCKET = 'amamylov-mlops/airflow_logs/'
+MLFLOW_S3_ENDPOINT_URL = 'https://storage.yandexcloud.net/'
 
 session = settings.Session()
 ycS3_connection = Connection(
@@ -29,7 +30,7 @@ ycS3_connection = Connection(
     extra={
         "aws_access_key_id": Variable.get("S3_KEY_ID"),
         "aws_secret_access_key": Variable.get("S3_SECRET_KEY"),
-        "host": "https://storage.yandexcloud.net/"
+        "host": MLFLOW_S3_ENDPOINT_URL
     }
 )
 
@@ -87,9 +88,12 @@ with DAG(
         connection_id=ycSA_connection.conn_id,
         dag=ingest_dag,
         properties={'spark.submit.deployMode': 'cluster',
-                    'spark.yarn.dist.archives': f's3a://{YC_SOURCE_BUCKET}/pyspark_venv.tar.gz#venv1',
+                    'spark.yarn.dist.archives': f's3a://{YC_SOURCE_BUCKET}/validation_models_venv.tar.gz#venv1',
                     'spark.yarn.appMasterEnv.PYSPARK_PYTHON': './venv1/bin/python',
-                    'spark.yarn.appMasterEnv.PYSPARK_DRIVER_PYTHON': './venv1/bin/python'}
+                    'spark.yarn.appMasterEnv.PYSPARK_DRIVER_PYTHON': './venv1/bin/python',
+                    'spark.yarn.appMasterEnv.AWS_ACCESS_KEY_ID': Variable.get("S3_KEY_ID"),
+                    'spark.yarn.appMasterEnv.AWS_SECRET_ACCESS_KEY': Variable.get("S3_SECRET_KEY"),
+                    'spark.yarn.appMasterEnv.MLFLOW_S3_ENDPOINT_URL': MLFLOW_S3_ENDPOINT_URL}
     )
 
     delete_spark_cluster = DataprocDeleteClusterOperator(
