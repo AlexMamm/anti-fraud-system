@@ -142,7 +142,6 @@ class FraudDetection:
 
         return sdf
 
-
     def evaluate_model(self, test: DataFrame, model: RandomForestClassifier) -> Tuple[float, float, float, float]:
         """
         Evaluate the model performance using precision, recall, F1-score, and AUC metrics.
@@ -219,7 +218,6 @@ class FraudDetection:
 
             train = train_class_0.union(train_class_1)
             test = test_class_0.union(test_class_1)
-
 
             rf = RandomForestClassifier(labelCol=self.config.label_col,
                                         featuresCol=self.config.vector_assembler_output_col,

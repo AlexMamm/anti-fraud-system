@@ -52,7 +52,7 @@ if not session.query(Connection).filter(Connection.conn_id == ycSA_connection.co
     session.commit()
 
 with DAG(
-        dag_id='pyspark_preprocessing',
+        dag_id='inference_model',
         start_date=datetime(year=2024, month=1, day=20),
         schedule_interval=timedelta(hours=6),
         catchup=False
@@ -84,11 +84,11 @@ with DAG(
 
     poke_spark_processing = DataprocCreatePysparkJobOperator(
         task_id='dp-cluster-pyspark-task',
-        main_python_file_uri=f's3a://{YC_SOURCE_BUCKET}/scripts/pyspark_script.py',
+        main_python_file_uri=f's3a://{YC_SOURCE_BUCKET}/scripts/pyspark_inference.py',
         connection_id=ycSA_connection.conn_id,
         dag=ingest_dag,
         properties={'spark.submit.deployMode': 'cluster',
-                    'spark.yarn.dist.archives': f's3a://{YC_SOURCE_BUCKET}/validation_models_venv.tar.gz#venv1',
+                    'spark.yarn.dist.archives': f's3a://{YC_SOURCE_BUCKET}/inference_models_venv.tar.gz#venv1',
                     'spark.yarn.appMasterEnv.PYSPARK_PYTHON': './venv1/bin/python',
                     'spark.yarn.appMasterEnv.PYSPARK_DRIVER_PYTHON': './venv1/bin/python',
                     'spark.yarn.appMasterEnv.AWS_ACCESS_KEY_ID': Variable.get("S3_KEY_ID"),

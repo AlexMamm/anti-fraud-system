@@ -1,1 +1,3 @@
 /authorized_key.json
+/.env
+/data/YandexCA.crt

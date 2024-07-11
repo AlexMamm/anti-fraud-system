@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "anti-fraud-system"
+version = "0.1.0"
+description = ""
+authors = ["Aleksandr Mamylov <alexmamilov619@gmail.com>"]
+readme = "README.md"
+packages = [{include = "anti_fraud_system"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+kafka-python = "^2.0.2"
+pydantic = "^2.8.2"
+pandas = "^2.2.2"
+pydantic-settings = "^2.3.4"
+pyarrow = "^16.1.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
