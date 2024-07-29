@@ -1,3 +1,4 @@
-/authorized_key.json
-/.env
-/data/YandexCA.crt
+/model_training/data/
+/model_training/.env
+/model_training/authorized_key.json
+/backend_of_service/model/
