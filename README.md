@@ -143,7 +143,7 @@ Anti-fraud system - система мониторинга и защиты от �
 ![Screenshot from 2024-07-30 13-04-25](https://github.com/user-attachments/assets/a295c1b0-e53b-4be6-abed-ef5d5d3cce2b)
 - Сервис развернут и протестирован на данных с транзакциями
 ![Screenshot from 2024-07-30 21-16-17](https://github.com/user-attachments/assets/4c655dd0-0e58-4060-8218-253daaca6296)
-![Screenshot from 2024-07-28 18-20-25](https://github.com/user-attachments/assets/ab503792-00be-4a71-8c6f-fd4de4cff87c)
+![Screenshot from 2024-07-30 21-27-56](https://github.com/user-attachments/assets/51d6e23b-bad2-49c4-aea7-9dad565908da)
 ![Screenshot from 2024-07-30 21-21-48](https://github.com/user-attachments/assets/751c6024-8e23-4c0e-8b88-1c7f7e77da7c)
 
 
