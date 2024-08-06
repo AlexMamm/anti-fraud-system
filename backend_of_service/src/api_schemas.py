@@ -17,6 +17,7 @@ class TransactionPredictionResponse(BaseModel):
     """Schema for representing the prediction result for a transaction."""
     transaction_id: int
     prediction: float
+    verdict: str
 
 
 class PredictResponseSchema(BaseModel):

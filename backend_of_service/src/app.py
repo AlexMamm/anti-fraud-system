@@ -1,22 +1,55 @@
 from typing import List
 
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, Response
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.ml.feature import VectorAssembler
 from pyspark.ml import PipelineModel
 import uvicorn
 import pandas as pd
+from starlette.middleware.base import BaseHTTPMiddleware
+from prometheus_client import Counter, CollectorRegistry, generate_latest, CONTENT_TYPE_LATEST
 
 from api_schemas import TransactionPredictionResponse, PredictResponseSchema, Transaction
 from config import Config
 
 
+registry = CollectorRegistry()
+legal_counter = Counter(
+    name='legal_transactions',
+    documentation='Count of legal transactions',
+    registry=registry
+)
+malicious_counter = Counter(
+    name='malicious_transactions',
+    documentation='Count of malicious transactions',
+    registry=registry
+)
+
 config = Config()
 app = FastAPI()
+
 spark = SparkSession.builder \
     .appName("TransactionProcessing") \
     .master("local[*]") \
     .getOrCreate()
+
+
+class PrometheusMiddleware(BaseHTTPMiddleware):
+    def __init__(self, app, registry):
+        super().__init__(app)
+        self.registry = registry
+
+    async def dispatch(self, request, call_next):
+        response = await call_next(request)
+        return response
+
+
+app.add_middleware(PrometheusMiddleware, registry=registry)
+
+
+@app.get("/metrics")
+async def metrics():
+    return Response(generate_latest(registry), media_type=CONTENT_TYPE_LATEST)
 
 
 def load_model() -> PipelineModel:
@@ -98,15 +131,25 @@ async def predict(
         predictions = model.transform(sdf)
         predicted_labels = [row["prediction"] for row in predictions.select("prediction").collect()]
 
-        response = [
-            TransactionPredictionResponse(transaction_id=transaction.transaction_id, prediction=pred)
-            for transaction, pred in zip(transactions, predicted_labels)
-        ]
+        response = []
+        for transaction, pred in zip(transactions, predicted_labels):
+            if pred < 0.5:
+                legal_counter.inc()
+                verdict = "legal_transactions"
+            else:
+                malicious_counter.inc()
+                verdict = "malicious_transactions"
+            response.append(
+                TransactionPredictionResponse(
+                    transaction_id=transaction.transaction_id,
+                    prediction=pred,
+                    verdict=verdict
+                )
+            )
         return PredictResponseSchema(data=response)
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 if __name__ == "__main__":
     config = Config()
