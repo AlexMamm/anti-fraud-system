@@ -153,7 +153,8 @@ Anti-fraud system - система мониторинга и защиты от �
 - Настроена grafana для отрисовки дашборда и фиксации алерта.
 - ![Screenshot from 2024-08-06 22-02-09](https://github.com/user-attachments/assets/1f3f0567-5610-4d8f-bdf3-4c0ef5ce0711)
 - Настроен телеграм бот и канал для получения алертов.
-![Screenshot from 2024-08-06 22-02-39](https://github.com/user-attachments/assets/6c6556ad-e689-4579-978b-740754dbc902)
+![Screenshot from 2024-08-06 22-30-17](https://github.com/user-attachments/assets/ec35d20f-833c-46d5-a041-3da66e54308e)
+
 
 
 
